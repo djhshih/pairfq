@@ -1,5 +1,8 @@
 # pairfq
 
+[![build](https://travis-ci.org/djhshih/pairfq.svg?branch=master)](https://travis-ci.org/djhshih/pairfq)
+[![codecov](https://codecov.io/gh/djhshih/pairfq/branch/master/graph/badge.svg)](https://codecov.io/gh/djhshih/pairfq)
+
 Pair first-read and second-second fastq files together, separating unpaired reads.
 
 ```{bash}

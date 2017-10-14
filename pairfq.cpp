@@ -124,6 +124,10 @@ inline bool read_next_fastq(istream& f, deque<fastq_entry>& q) {
  * Assume that `r1.fq` and `r2.fq` are both sorted naturally.
  * (e.g. the source BAM file was sorted by `sambamba sort -N` or `samtools sort -n`).
  *
+ * The output file `out.fq` will contain interleaved read pairs with 
+ * unpaired reads removed, and this file should be suitable for alignment 
+ * with `bwa mem -p`.
+ *
  * Unpaired reads will be written to `unpaired.fq`, if available.
  */
 int main(int argc, char* argv[]) {

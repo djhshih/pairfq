@@ -9,7 +9,7 @@ pairfq: pairfq.cpp
 
 coverage: pairfq.cpp
 	$(CXX) -coverage -O0 $? -o $@
-	./coverage
+	./coverage data/r1.fq data/r2.fq out/out.fq out/unpaired.fq
 	gcov $?
 
 check: pairfq

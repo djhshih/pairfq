@@ -3,6 +3,7 @@
 #include <deque>
 #include <string>
 #include <stdexcept>
+#include <cstring>
 
 using namespace std;
 
@@ -155,10 +156,10 @@ int main(int argc, char* argv[]) {
         r1_fname = argv[1];
         r2_fname = argv[2];
         out_fname = argv[3];
-        if (argv[4] == "natural") {
+        if (strcmp(argv[4], "natural") == 0) {
             natural_sort = true;
         }
-        if (argv[5] != "null") {
+        if (strcmp(argv[5], "null") != 0) {
             unpaired_fname = argv[5];
         }
     }

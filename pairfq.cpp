@@ -45,9 +45,9 @@ int strnum_cmp(const char *_a, const char *_b) {
 }
 
 /**
- * Compare two read names by natural order.
+ * Compare two read names by lexical or natural order.
  */
-int compare_qnames(const string& a, const string& b) {
+int compare_qnames(const string& a, const string& b, bool natural) {
     size_t a_end = a.length();
     size_t b_end = b.length();
     if (a.substr(a_end - 2) == "/1") {
@@ -57,7 +57,10 @@ int compare_qnames(const string& a, const string& b) {
         b_end -= 2;
     }
     
-    return strnum_cmp(a.substr(0, a_end).c_str(), b.substr(0, b_end).c_str());
+    if (natural) {
+        return strnum_cmp(a.substr(0, a_end).c_str(), b.substr(0, b_end).c_str());
+    }
+    return a.substr(0, a_end).compare(b.substr(0, b_end));
 }
 
 /** 
@@ -118,17 +121,23 @@ inline bool read_next_fastq(istream& f, deque<fastq_entry>& q) {
 /**
  * Pair first-read and second-second fastq files together, separating unpaired reads.
  *
- * usage: pairfq <r1.fq> <r2.fq> <out.fq> [unpaired.fq]
- * 
  * Assume that each sequence and quality score entry `r1.fq` and `r2.fq` is single-line.
- * Assume that `r1.fq` and `r2.fq` are both sorted naturally.
- * (e.g. the source BAM file was sorted by `sambamba sort -N` or `samtools sort -n`).
+ *
+ * Assume that `r1.fq` and `r2.fq` are both sorted according `sort_type`
+ * (`lexical` or `natural`).
+ * If `sort_type == natural`, then the reads in the source BAM file should 
+ * be been sorted by `sambamba sort -N` or `samtools sort -n`).
+ * If `sort_type == lexical`, then the reads in should be been sorted
+ * by `sambamba sort -n` or `java -jar Picard.jar RevertSam
+ * SORT_ORDER=queryname`.
  *
  * The output file `out.fq` will contain interleaved read pairs with 
  * unpaired reads removed, and this file should be suitable for alignment 
  * with `bwa mem -p`.
  *
- * Unpaired reads will be written to `unpaired.fq`, if available.
+ *
+ * Unpaired reads will be written to `unpaired.fq` if it has not been set to
+ * `null`.
  */
 int main(int argc, char* argv[]) {
 
@@ -136,17 +145,21 @@ int main(int argc, char* argv[]) {
     char* r2_fname;
     char* out_fname;
     char* unpaired_fname = NULL;
+    bool natural_sort = false;
 
     int nargs = argc - 1;
-    if (nargs < 3) {
-        cerr << "usage: pairfq <r1.fq> <r2.fq> <out.fq> [unpaired.fq]" << endl;
+    if (nargs < 5) {
+        cerr << "usage: pairfq <r1.fq> <r2.fq> <out.fq> <sort_type> <unpaired.fq>" << endl;
         return 1;
     } else {
         r1_fname = argv[1];
         r2_fname = argv[2];
         out_fname = argv[3];
-        if (nargs >= 4) {
-            unpaired_fname = argv[4];
+        if (argv[4] == "natural") {
+            natural_sort = true;
+        }
+        if (argv[5] != "null") {
+            unpaired_fname = argv[5];
         }
     }
     
@@ -177,7 +190,7 @@ int main(int argc, char* argv[]) {
           if (!read_next_fastq(r2f, r2q)) break;
         }
         
-        int cmp = compare_qnames(r1q.front().qname, r2q.front().qname);
+        int cmp = compare_qnames(r1q.front().qname, r2q.front().qname, natural_sort);
 
         if (cmp < 0) {
             // current element of list 1 is smaller:

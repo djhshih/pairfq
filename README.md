@@ -6,12 +6,16 @@
 Pair first-read and second-second fastq files together, separating unpaired reads.
 
 ```{bash}
-usage: pairfq <r1.fq> <r2.fq> <out.fq> [unpaired.fq]
+usage: pairfq <r1.fq> <r2.fq> <out.fq> <sort_type> [unpaired.fq]
 ```
 
 Assume that each sequence and quality score entry `r1.fq` and `r2.fq` is single-line.
-Assume that `r1.fq` and `r2.fq` are both sorted naturally.
+
+If `sort_type == natural`, assume that `r1.fq` and `r2.fq` are both sorted naturally.
 (e.g. the source BAM file was sorted by `sambamba sort -N` or `samtools sort -n`).
+
+Otherwise, assume the reads have been sorted lexicographically.
+(e.g. the source BAM file was sorted by `sambamba sort -n` or `java -jar Picard.jar RevertSam SORT_ORDER=queryname`.)
 
 The output file `out.fq` will contain interleaved read pairs with 
 unpaired reads removed, and this file should be suitable for alignment with `bwa mem -p`.
@@ -40,7 +44,7 @@ Otherwise, the below commands are necessary to ensure that `r1.fq` and `r2.fq`
 are paired correctly.
 
 ```{bash}
-pairfq r1.fq r2.fq out.fq unmarked-unpaired.fq
+pairfq r1.fq r2.fq out.fq natural unmarked-unpaired.fq
 ```
 
 Now, we can re-align the read pairs to another reference genome by

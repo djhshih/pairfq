@@ -33,8 +33,8 @@ We choose here to sort the reads by read name (in natural order), and
 extract the sorted reads.
 
 ```{bash}
-samtools sort -n -o qsorted.bam sample.bam
-samtools fastq -0 marked-unpaired.fq -1 r1.fq -2 r2.fq qsorted.bam
+samtools sort -n -o qn-sorted.bam sample.bam
+samtools fastq -0 marked-unpaired.fq -1 r1.fq -2 r2.fq qn-sorted.bam
 ```
 
 If all unpaired reads in `sample.bam` are properly marked, the above command

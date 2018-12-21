@@ -1,5 +1,6 @@
 CXX=g++
 CPPFLAGS=-O3
+DESTDIR ?= /usr/local
 
 all: pairfq
 	
@@ -22,6 +23,10 @@ coverage: check
 
 test: check
 	
+
+install: pairfq
+	mkdir -p $(DESTDIR)/bin/
+	install pairfq $(DESTDIR)/bin/
 
 clean:
 	rm -f pairfq check
